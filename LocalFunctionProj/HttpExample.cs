@@ -13,10 +13,12 @@ namespace LocalFunctionProj
     public class HttpExample
     {
         private readonly ILogger<HttpExample> _logger;
+        private readonly MessageCreator _messageCreator;
 
-        public HttpExample(ILogger<HttpExample> logger)
+        public HttpExample(ILogger<HttpExample> logger, MessageCreator messageCreator)
         {
             _logger = logger;
+            _messageCreator = messageCreator;
         }
 
         [FunctionName("HttpExample")]
@@ -24,9 +26,7 @@ namespace LocalFunctionProj
             [HttpTrigger(AuthorizationLevel.Function, "get", "post", Route = null)]
             HttpRequest req)
         {
-            var log = _logger;
-
-            log.LogInformation("C# HTTP trigger function processed a request.");
+            _logger.LogInformation("C# HTTP trigger function processed a request.");
 
             string name = req.Query["name"];
 
@@ -34,9 +34,7 @@ namespace LocalFunctionProj
             dynamic data = JsonConvert.DeserializeObject(requestBody);
             name = name ?? data?.name;
 
-            string responseMessage = string.IsNullOrEmpty(name)
-                ? "This HTTP triggered function executed successfully. Pass a name in the query string or in the request body for a personalized response."
-                : $"Hello, {name}. This HTTP triggered function executed successfully.";
+            string responseMessage = _messageCreator.Create(name);
 
             return new OkObjectResult(responseMessage);
         }
