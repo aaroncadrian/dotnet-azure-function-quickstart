@@ -10,13 +10,22 @@ using Newtonsoft.Json;
 
 namespace LocalFunctionProj
 {
-    public static class HttpExample
+    public class HttpExample
     {
-        [FunctionName("HttpExample")]
-        public static async Task<IActionResult> Run(
-            [HttpTrigger(AuthorizationLevel.Function, "get", "post", Route = null)] HttpRequest req,
-            ILogger log)
+        private readonly ILogger<HttpExample> _logger;
+
+        public HttpExample(ILogger<HttpExample> logger)
         {
+            _logger = logger;
+        }
+
+        [FunctionName("HttpExample")]
+        public async Task<IActionResult> Run(
+            [HttpTrigger(AuthorizationLevel.Function, "get", "post", Route = null)]
+            HttpRequest req)
+        {
+            var log = _logger;
+
             log.LogInformation("C# HTTP trigger function processed a request.");
 
             string name = req.Query["name"];
